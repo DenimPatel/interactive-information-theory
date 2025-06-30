@@ -1,0 +1,6 @@
+{
+  "name": "Bent Coin Information Theory Explorer",
+  "description": "An interactive web application to explore fundamental concepts of Information Theory like Probability, Information Content, and Entropy using the analogy of a bent coin.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
