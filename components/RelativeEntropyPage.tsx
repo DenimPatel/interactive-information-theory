@@ -29,7 +29,7 @@ const RelativeEntropyPage: React.FC<RelativeEntropyPageProps> = ({ onNavigateBac
 
     const d_kl_P_Q = calculateKLDivergence(P_probs, Q_probs);
     const d_kl_Q_P = calculateKLDivergence(Q_probs, P_probs);
-    
+
     const terms: KLTerm[] = [
       {
         outcome: "Outcome 1",
@@ -60,7 +60,7 @@ const RelativeEntropyPage: React.FC<RelativeEntropyPageProps> = ({ onNavigateBac
     if (typeof value === 'number') return value.toFixed(4);
     return value; // "Infinity", "Error", "Invalid variance" etc.
   };
-  
+
   const formatTermValue = (value: number | string) => {
     if (typeof value === 'number') return value.toFixed(3);
     if (value === "Infinity") return <span className="text-red-500 font-semibold">Infinity</span>;
@@ -72,7 +72,7 @@ const RelativeEntropyPage: React.FC<RelativeEntropyPageProps> = ({ onNavigateBac
     "Relative entropy, also known as Kullback-Leibler (KL) divergence, measures the 'distance' or difference between two probability distributions. It quantifies how much one probability distribution P diverges from a second, reference probability distribution Q.",
     "Specifically, it's the measure of information lost when Q is used to approximate P. It is not a true metric (e.g., it's not symmetric: DKL(P||Q) ≠ DKL(Q||P)) but is fundamental in fields like statistics, machine learning, and information theory.",
   ];
-  
+
   const discreteKLExplanation = [
     "For discrete probability distributions P and Q defined on the same probability space, Ξ, the KL divergence from Q to P is defined as:",
   ];
@@ -110,9 +110,9 @@ const RelativeEntropyPage: React.FC<RelativeEntropyPageProps> = ({ onNavigateBac
           title="Understanding Relative Entropy"
           explanation={relativeEntropyExplanation}
         />
-        
+
         <Card title="Interactive KL Divergence for Discrete Distributions" className="mt-6 bg-slate-50">
-           <ConceptExplainer
+          <ConceptExplainer
             title="" // No title, just the formula and text
             explanation={discreteKLExplanation}
             formula="DKL(P || Q) = Σ P(x) log₂(P(x) / Q(x))"
@@ -174,71 +174,71 @@ const RelativeEntropyPage: React.FC<RelativeEntropyPageProps> = ({ onNavigateBac
                       </tr>
                     ))}
                     <tr className="bg-slate-50 font-semibold">
-                       <td className="px-3 py-2 text-sm text-slate-800" colSpan={3}>Total (D<sub>KL</sub>):</td>
-                       <td className="px-3 py-2 text-sm text-sky-700">{formatKLValue(klMetricsDiscrete.d_kl_P_Q)}</td>
-                       <td className="px-3 py-2 text-sm text-emerald-700">{formatKLValue(klMetricsDiscrete.d_kl_Q_P)}</td>
+                      <td className="px-3 py-2 text-sm text-slate-800" colSpan={3}>Total (D<sub>KL</sub>):</td>
+                      <td className="px-3 py-2 text-sm text-sky-700">{formatKLValue(klMetricsDiscrete.d_kl_P_Q)}</td>
+                      <td className="px-3 py-2 text-sm text-emerald-700">{formatKLValue(klMetricsDiscrete.d_kl_Q_P)}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
             </div>
-             { (klMetricsDiscrete.d_kl_P_Q === "Infinity" || klMetricsDiscrete.d_kl_Q_P === "Infinity") && (
-                <p className="text-xs text-red-600 mt-2">
-                  Note: KL Divergence is infinite if Q(x) = 0 for any outcome x where P(x) > 0 (for D<sub>KL</sub>(P || Q)), or vice-versa. This implies that the approximating distribution assigns zero probability to an event that can actually occur.
-                </p>
-              )}
+            {(klMetricsDiscrete.d_kl_P_Q === "Infinity" || klMetricsDiscrete.d_kl_Q_P === "Infinity") && (
+              <p className="text-xs text-red-600 mt-2">
+                Note: KL Divergence is infinite if Q(x) = 0 for any outcome x where P(x) &gt; 0 (for D<sub>KL</sub>(P || Q)), or vice-versa. This implies that the approximating distribution assigns zero probability to an event that can actually occur.
+              </p>
+            )}
           </div>
         </Card>
 
         <Card title="Interactive KL Divergence for Normal Distributions" className="mt-8 bg-slate-50">
-            <ConceptExplainer
-                title="" // No title, just explanation and formula
-                explanation={normalKLExplanation}
-                formula={normalKLFormula}
+          <ConceptExplainer
+            title="" // No title, just explanation and formula
+            explanation={normalKLExplanation}
+            formula={normalKLFormula}
+          />
+          <p className="text-sm text-slate-600 mb-4 mt-2">
+            Adjust the mean (μ) and variance (σ²) for two Normal (Gaussian) distributions P and Q. Observe how the KL Divergence changes. Variances must be positive.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <NormalDistributionInput
+              label="Distribution P ~ N(μP, σ²P)"
+              mean={meanP_norm}
+              onMeanChange={setMeanP_norm}
+              variance={varianceP_norm}
+              onVarianceChange={setVarianceP_norm}
+              color="sky"
             />
-            <p className="text-sm text-slate-600 mb-4 mt-2">
-                Adjust the mean (μ) and variance (σ²) for two Normal (Gaussian) distributions P and Q. Observe how the KL Divergence changes. Variances must be positive.
+            <NormalDistributionInput
+              label="Distribution Q ~ N(μQ, σ²Q)"
+              mean={meanQ_norm}
+              onMeanChange={setMeanQ_norm}
+              variance={varianceQ_norm}
+              onVarianceChange={setVarianceQ_norm}
+              color="emerald"
+            />
+          </div>
+          <div>
+            <h4 className="text-lg font-semibold text-slate-700">Calculated KL Divergences (Normal):</h4>
+            <p className="text-md text-slate-600">
+              D<sub>KL</sub>(P || Q): <span className={`font-bold ${klMetricsNormal.d_kl_P_Q_normal === "Invalid variance" ? 'text-red-600' : 'text-sky-600'}`}>{formatKLValue(klMetricsNormal.d_kl_P_Q_normal)}</span> bits
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <NormalDistributionInput
-                    label="Distribution P ~ N(μP, σ²P)"
-                    mean={meanP_norm}
-                    onMeanChange={setMeanP_norm}
-                    variance={varianceP_norm}
-                    onVarianceChange={setVarianceP_norm}
-                    color="sky"
-                />
-                <NormalDistributionInput
-                    label="Distribution Q ~ N(μQ, σ²Q)"
-                    mean={meanQ_norm}
-                    onMeanChange={setMeanQ_norm}
-                    variance={varianceQ_norm}
-                    onVarianceChange={setVarianceQ_norm}
-                    color="emerald"
-                />
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold text-slate-700">Calculated KL Divergences (Normal):</h4>
-              <p className="text-md text-slate-600">
-                D<sub>KL</sub>(P || Q): <span className={`font-bold ${klMetricsNormal.d_kl_P_Q_normal === "Invalid variance" ? 'text-red-600' : 'text-sky-600'}`}>{formatKLValue(klMetricsNormal.d_kl_P_Q_normal)}</span> bits
+            <p className="text-md text-slate-600">
+              D<sub>KL</sub>(Q || P): <span className={`font-bold ${klMetricsNormal.d_kl_Q_P_normal === "Invalid variance" ? 'text-red-600' : 'text-emerald-600'}`}>{formatKLValue(klMetricsNormal.d_kl_Q_P_normal)}</span> bits
+            </p>
+            {(klMetricsNormal.d_kl_P_Q_normal === "Invalid variance" || klMetricsNormal.d_kl_Q_P_normal === "Invalid variance") && (
+              <p className="text-xs text-red-600 mt-1">
+                Note: Variance (σ²) must be greater than 0 for KL Divergence calculation between normal distributions.
               </p>
-              <p className="text-md text-slate-600">
-                D<sub>KL</sub>(Q || P): <span className={`font-bold ${klMetricsNormal.d_kl_Q_P_normal === "Invalid variance" ? 'text-red-600' : 'text-emerald-600'}`}>{formatKLValue(klMetricsNormal.d_kl_Q_P_normal)}</span> bits
-              </p>
-               { (klMetricsNormal.d_kl_P_Q_normal === "Invalid variance" || klMetricsNormal.d_kl_Q_P_normal === "Invalid variance") && (
-                <p className="text-xs text-red-600 mt-1">
-                  Note: Variance (σ²) must be greater than 0 for KL Divergence calculation between normal distributions.
-                </p>
-              )}
-            </div>
-            <NormalDistributionsChart
-                meanP={meanP_norm}
-                varianceP={varianceP_norm}
-                meanQ={meanQ_norm}
-                varianceQ={varianceQ_norm}
-                colorP="#0ea5e9"      // sky-500 for P
-                colorQ="#10b981"      // emerald-500 for Q
-            />
+            )}
+          </div>
+          <NormalDistributionsChart
+            meanP={meanP_norm}
+            varianceP={varianceP_norm}
+            meanQ={meanQ_norm}
+            varianceQ={varianceQ_norm}
+            colorP="#0ea5e9"      // sky-500 for P
+            colorQ="#10b981"      // emerald-500 for Q
+          />
         </Card>
 
 
@@ -252,13 +252,13 @@ const RelativeEntropyPage: React.FC<RelativeEntropyPageProps> = ({ onNavigateBac
             </ul>
           ]}
         />
-        
+
         <ConceptExplainer
           title="Why is KL Divergence useful?"
           explanation={practicalExample}
         />
       </Card>
-      
+
     </main>
   );
 };
