@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* For Recharts responsive container to work correctly */
+.recharts-responsive-container {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.recharts-surface {
+  overflow: visible; /* Helps with labels not being cut off sometimes */
+}
