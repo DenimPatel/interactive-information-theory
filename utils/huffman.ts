@@ -1,4 +1,4 @@
-import type { HuffmanNode, HuffmanFrequency, HuffmanCode, HuffmanStats, HuffmanResult } from '../types';
+import type { HuffmanNode, HuffmanFrequency, HuffmanCode, HuffmanStats, HuffmanResult, HuffmanTreeLayout, HuffmanTreeLayoutNode } from '../types';
 
 /**
  * Calculates the frequency of each character in a given text.
@@ -165,4 +165,47 @@ export const processHuffmanEncoding = (text: string): HuffmanResult => {
     stats,
     treeRoot, // Tree can be used for visualization later
   };
+};
+
+/**
+ * Lays out a Huffman tree for SVG rendering: leaves are placed left-to-right
+ * in a fixed column spacing, and each internal node is centered above its
+ * children.
+ */
+export const layoutHuffmanTree = (root: HuffmanNode | null): HuffmanTreeLayout => {
+  const nodes: HuffmanTreeLayoutNode[] = [];
+  const edges: HuffmanTreeLayout['edges'] = [];
+  let leafX = 0;
+  const COLUMN_WIDTH = 55;
+  const LEVEL_HEIGHT = 70;
+
+  const place = (node: HuffmanNode | null, depth: number): number | null => {
+    if (!node) return null;
+    let x: number;
+    if (node.char !== null && !node.left && !node.right) {
+      x = leafX * COLUMN_WIDTH + 30;
+      leafX++;
+    } else {
+      const leftX = place(node.left, depth + 1);
+      const rightX = place(node.right, depth + 1);
+      x = leftX != null && rightX != null ? (leftX + rightX) / 2 : (leftX ?? rightX ?? 30);
+    }
+    const y = depth * LEVEL_HEIGHT + 30;
+    nodes.push({ id: node.id, x, y, char: node.char, freq: node.freq });
+    if (node.left) {
+      const child = nodes.find(n => n.id === node.left!.id)!;
+      edges.push({ x1: x, y1: y, x2: child.x, y2: child.y, label: '0', lx: (x + child.x) / 2 - 6, ly: (y + child.y) / 2 });
+    }
+    if (node.right) {
+      const child = nodes.find(n => n.id === node.right!.id)!;
+      edges.push({ x1: x, y1: y, x2: child.x, y2: child.y, label: '1', lx: (x + child.x) / 2 + 6, ly: (y + child.y) / 2 });
+    }
+    return x;
+  };
+
+  if (!root) return { nodes, edges, width: 200, height: 100 };
+  place(root, 0);
+  const width = Math.max(200, leafX * COLUMN_WIDTH + 30);
+  const maxY = nodes.reduce((m, n) => Math.max(m, n.y), 0);
+  return { nodes, edges, width, height: maxY + 40 };
 };

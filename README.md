@@ -37,7 +37,8 @@ key concept:
 
 - [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vitejs.dev/) for tooling and bundling
-- [Recharts](https://recharts.org/) and [Plotly.js](https://plotly.com/javascript/) for charts and visualizations
+- Hand-rolled inline SVG charts, no charting library
+- The [Broadsheet](broadsheet.css) design system for styling
 
 ## Run Locally
 

@@ -1,32 +1,3 @@
-
-
-export interface InfoMetrics {
-  pHeads: number;
-  pTails: number;
-  iHeads: number | string; // Can be "Infinity"
-  iTails: number | string; // Can be "Infinity"
-  entropy: number;
-}
-
-export interface ChartDataPoint {
-  pHeads: number;
-  entropy: number;
-}
-
-export interface KLTerm {
-  outcome: string;
-  p_val: number;
-  q_val: number;
-  term_P_double_bar_Q: number | string;
-  term_Q_double_bar_P: number | string;
-}
-
-export interface KLMetrics {
-  d_kl_P_Q: number | string;
-  d_kl_Q_P: number | string;
-  terms: KLTerm[];
-}
-
 // --- Huffman Encoding Types ---
 
 // Represents a node in the Huffman tree
@@ -65,76 +36,35 @@ export interface HuffmanResult {
   codes: HuffmanCode[];
   encodedString: string;
   stats: HuffmanStats | null;
-  treeRoot: HuffmanNode | null; // Optional: for potential future visualization
+  treeRoot: HuffmanNode | null;
 }
 
-// --- Binary Symmetric Channel Metrics ---
-export interface BSCMetrics {
-  p_crossover: number; // Crossover probability p
-  q_probX0: number;    // Input probability P(X=0)
-
-  probX0: number;      // P(X=0)
-  probX1: number;      // P(X=1)
-  H_X: number;         // Entropy of input X H(X)
-
-  probY0: number;      // Output probability P(Y=0)
-  probY1: number;      // Output probability P(Y=1)
-  H_Y: number;         // Entropy of output Y H(Y)
-
-  H_Y_given_X: number; // Conditional entropy H(Y|X), which is H(p_crossover) for BSC
-  I_X_Y: number;       // Mutual Information I(X;Y)
-  
-  capacity: number;    // Channel Capacity C = 1 - H(p_crossover)
-}
-
-// --- Mutual Information vs P(X=0) Chart ---
-export interface MutualInfoChartDataPoint {
-  qProbX0: number; // P(X=0)
-  mutualInformation: number; // I(X;Y)
-}
-
-// --- Conditional Entropy Page Metrics ---
-export interface ConditionalEntropyMetrics {
-  pSunny: number; pRainy: number;
-  pSunglassesGivenSunny: number; pNoSunglassesGivenSunny: number;
-  pSunglassesGivenRainy: number; pNoSunglassesGivenRainy: number;
-  pSunny_Yes: number; pSunny_No: number; pRainy_Yes: number; pRainy_No: number;
-  pSunglassesYes: number; pSunglassesNo: number;
-  H_X: number; H_Y: number;
-  H_Y_given_Sunny: number; H_Y_given_Rainy: number; H_Y_given_X: number;
-  H_X_Y: number; I_X_Y: number;
-}
-
-// --- Bayesian Inference Page Metrics ---
-export interface BayesianInferenceMetrics {
-  priorDisease: number;       // P(Disease)
-  sensitivity: number;      // P(Positive Test | Disease)
-  specificity: number;      // P(Negative Test | No Disease)
-
-  probNoDisease: number;    // P(No Disease) = 1 - P(Disease)
-  falsePositiveRate: number;// P(Positive Test | No Disease) = 1 - specificity
-  
-  // Numerator term for P(Disease | Positive Test)
-  p_Pos_given_Disease_times_p_Disease: number; // P(Positive Test | Disease) * P(Disease)
-  
-  // Terms for P(Positive Test) - the evidence/marginal likelihood
-  p_Pos_given_NoDisease_times_p_NoDisease: number; // P(Positive Test | No Disease) * P(No Disease)
-  
-  probPositiveTest: number; // P(Positive Test)
-  
-  posteriorDiseaseGivenPositive: number; // P(Disease | Positive Test)
-}
-
-// --- Bayesian Probability Plot Data Point ---
-export interface BayesianPlotDataPoint {
-  variableValue: number; // Value of the x-axis variable (prior, sensitivity, or specificity)
-  posterior: number;   // Calculated P(Disease | Positive Test)
-}
-
-// --- Bayesian Curve Fitting Demo Types ---
-export interface CurveDataPoint {
+// --- Huffman Tree Layout (for SVG rendering) ---
+export interface HuffmanTreeLayoutNode {
+  id: string;
   x: number;
-  y_noisy: number;
-  y_true?: number;
-  y_fitted?: number;
+  y: number;
+  char: string | null;
+  freq: number;
+}
+
+export interface HuffmanTreeLayoutEdge {
+  x1: number; y1: number; x2: number; y2: number;
+  label: '0' | '1';
+  lx: number; ly: number;
+}
+
+export interface HuffmanTreeLayout {
+  nodes: HuffmanTreeLayoutNode[];
+  edges: HuffmanTreeLayoutEdge[];
+  width: number;
+  height: number;
+}
+
+// --- Monty Hall ---
+export interface MontyDoor {
+  id: number;
+  hasCar: boolean;
+  isOpen: boolean;
+  isPlayerChoice: boolean;
 }
