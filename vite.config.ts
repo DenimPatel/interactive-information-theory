@@ -5,4 +5,12 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   base: '/interactive-information-theory/',
+  build: {
+    rollupOptions: {
+      output: {
+        // KaTeX caches independently of the app; the home page stays KaTeX-free.
+        manualChunks: { katex: ['katex'] },
+      },
+    },
+  },
 });
