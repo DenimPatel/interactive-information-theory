@@ -1,12 +1,54 @@
 import React, { useState } from 'react';
-import Slider from './Slider';
-import MetricRow from './MetricRow';
-import { calculateEntropy, pLogP } from '../utils/informationTheory';
+import Slider from '../Slider';
+import MetricRow from '../MetricRow';
+import LecturePage from '../shell/LecturePage';
+import Formula from '../ui/Formula';
+import Quiz, { type QuizQuestion } from '../quiz/Quiz';
+import { calculateEntropy, pLogP } from '../../utils/informationTheory';
+import { FORMULAS } from '../../content/formulas';
+
+const F = FORMULAS['conditional-entropy'];
+
+const QUESTIONS: QuizQuestion[] = [
+  {
+    id: 'independent',
+    kind: 'choice',
+    prompt: 'If X and Y are independent, what is H(Y | X)?',
+    options: [
+      { label: '0' },
+      { label: 'H(Y)', correct: true },
+      { label: 'H(X) + H(Y)' },
+      { label: 'It is undefined' },
+    ],
+    explanation: 'Knowing X tells you nothing about Y, so your uncertainty about Y is unchanged.',
+  },
+  {
+    id: 'certain',
+    kind: 'numeric',
+    prompt: 'Suppose P(Yes | Sunny) = 1 and P(Yes | Rainy) = 0. What is H(Y | X) in bits?',
+    answer: 0,
+    tolerance: 1e-6,
+    unit: 'bits',
+    explanation: 'Once the weather is known, sunglasses are certain — no residual uncertainty remains.',
+  },
+  {
+    id: 'mutual-zero',
+    kind: 'choice',
+    prompt: 'I(X; Y) = 0 exactly when…',
+    options: [
+      { label: 'H(X) = H(Y)' },
+      { label: 'X and Y are independent', correct: true },
+      { label: 'Y is a deterministic function of X' },
+      { label: 'H(X | Y) = H(Y | X)' },
+    ],
+    explanation: 'Mutual information measures shared information; independence means there is none.',
+  },
+];
 
 const ConditionalEntropyPage: React.FC = () => {
   const [pSunny, setPSunny] = useState<number>(0.6);
-  const [pGivenSunny, setPGivenSunny] = useState<number>(0.9); // P(Yes | Sunny)
-  const [pGivenRainy, setPGivenRainy] = useState<number>(0.1); // P(Yes | Rainy)
+  const [pGivenSunny, setPGivenSunny] = useState<number>(0.9);
+  const [pGivenRainy, setPGivenRainy] = useState<number>(0.1);
 
   const pRainy = 1 - pSunny;
   const noSunny = 1 - pGivenSunny;
@@ -27,16 +69,12 @@ const ConditionalEntropyPage: React.FC = () => {
   const iXY = hY - hYX;
 
   return (
-    <section>
-      <div className="card-kicker">Foundations</div>
-      <h2>Conditional Entropy &amp; Chain Rule</h2>
-      <p className="text-muted" style={{ maxWidth: 640 }}>
-        H(Y|X) quantifies remaining uncertainty about Y once X is known: 0 &le; H(Y|X) &le; H(Y), equal to H(Y)
-        only when X and Y are independent.
+    <LecturePage slug="conditional-entropy" quiz={<Quiz slug="conditional-entropy" questions={QUESTIONS} />}>
+      <p className="it-body-block">
+        H(Y|X) quantifies the remaining uncertainty about Y once X is known: 0 ≤ H(Y|X) ≤ H(Y), equal
+        to H(Y) only when X and Y are independent.
       </p>
-      <p style={{ fontStyle: 'italic', color: 'var(--color-accent-700)', margin: 'var(--space-3) 0 var(--space-6) 0' }}>
-        H(Y|X) = &Sigma;&#7623; p(x) H(Y|X=x) = &minus;&Sigma;&#7623;&#7616; p(x,y) log&#8322;(p(y|x))
-      </p>
+      <Formula tex={F.definition} note="the remaining uncertainty in Y given X" label="Conditional entropy of Y given X" />
 
       <h4>Weather (X) &amp; Sunglasses (Y)</h4>
       <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', margin: 'var(--space-3) 0 var(--space-5) 0' }}>
@@ -84,15 +122,14 @@ const ConditionalEntropyPage: React.FC = () => {
       </div>
 
       <h4 style={{ marginTop: 'var(--space-6)' }}>Chain Rule of Entropy</h4>
-      <p style={{ fontStyle: 'italic', color: 'var(--color-accent-700)', margin: 'var(--space-3) 0 var(--space-3) 0' }}>
-        H(X,Y) = H(X) + H(Y|X) = H(Y) + H(X|Y)
+      <Formula tex={F.chainRule} note="the chain rule" label="H of X and Y equals H of X plus H of Y given X" />
+      <Formula tex={F.mutualInfo} note="mutual information, two equivalent ways" label="Mutual information of X and Y" />
+      <p className="it-body-block">
+        The total uncertainty of Weather and Sunglasses together equals the uncertainty about Weather,
+        plus the remaining uncertainty about Sunglasses once Weather is known. This generalises to n
+        variables by chaining one conditional at a time.
       </p>
-      <p style={{ maxWidth: 640 }}>
-        The total uncertainty of Weather and Sunglasses together equals the uncertainty about Weather, plus the
-        remaining uncertainty about Sunglasses once Weather is known. Generalizes to n variables:
-        H(X&#8321;,&hellip;,X&#8345;) = &Sigma;&#7522; H(X&#7522; | X&#7522;&minus;&#8321;,&hellip;,X&#8321;).
-      </p>
-    </section>
+    </LecturePage>
   );
 };
 
